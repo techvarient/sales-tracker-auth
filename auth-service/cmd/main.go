@@ -32,7 +32,7 @@ func main() {
 	e := echo.New()
 
 	// Validate database configuration
-	if cfg.DatabaseURL == "" {
+	if cfg.GetDatabaseURL() == "" {
 		log.Fatal("DatabaseURL configuration missing - check config.yaml")
 	}
 
