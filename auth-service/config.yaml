@@ -1,0 +1,19 @@
+# Server Configuration
+port: "8080"
+
+# JWT Configuration
+jwt_secret: "your-secret-key-here"
+
+# SMTP Configuration
+smtp:
+  host: "smtp.gmail.com"
+  port: "587"
+  user: "abhishekbrichhaliya@gmail.com"
+  pass: "your-app-specific-password"
+  from: "noreply@sales-tracker.com"
+  from_name: "Sales Tracker Team"
+
+# Application URLs
+base_url: "http://localhost:3000"
+password_reset_path: "/reset-password"
+verification_path: "/verify"

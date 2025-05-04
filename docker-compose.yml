@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8080:8080"
+    environment:
+      - AUTH_DATABASE_HOST=db.spjqkrsbpwwitwldksvt.supabase.co
+      - AUTH_DATABASE_PORT=5432
+      - AUTH_DATABASE_NAME=postgres
+      - AUTH_DATABASE_USER=postgres
+      - AUTH_DATABASE_PASSWORD=1234winnie
+      - AUTH_JWT_SECRET=your-secret-key-here
+
+volumes:
+  postgres_data:
