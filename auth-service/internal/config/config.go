@@ -2,29 +2,30 @@ package config
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
-	"log"
 )
 
 type Config struct {
-	Port           string
-	JWTSecret      string
-	DatabaseURL    string
-	DatabaseName   string
-	DatabaseUser   string
+	Port             string
+	JWTSecret        string
+	DatabaseURL      string
+	DatabaseName     string
+	DatabaseUser     string
 	DatabasePassword string
-	DatabaseHost   string
-	DatabasePort   string
-	SMTPHost       string
-	SMTPPort       string
-	SMTPUser       string
-	SMTPPass       string
-	SMTPFrom       string
-	SMTPFromName   string
-	BaseURL        string
-	PasswordReset  string
-	Verification   string
+	DatabaseHost     string
+	DatabasePort     string
+	SMTPHost         string
+	SMTPPort         string
+	SMTPUser         string
+	SMTPPass         string
+	SMTPFrom         string
+	SMTPFromName     string
+	BaseURL          string
+	PasswordReset    string
+	Verification     string
 }
 
 func NewConfig() (*Config, error) {
@@ -36,7 +37,7 @@ func NewConfig() (*Config, error) {
 	// Initialize Viper
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("../../")  // Look two levels up from the current directory
+	viper.AddConfigPath("./../") // Look two levels up from the current directory
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
