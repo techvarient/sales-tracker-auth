@@ -9,23 +9,23 @@ import (
 )
 
 type Config struct {
-	Port             string
-	JWTSecret        string
-	DatabaseURL      string
-	DatabaseName     string
-	DatabaseUser     string
-	DatabasePassword string
-	DatabaseHost     string
-	DatabasePort     string
-	SMTPHost         string
-	SMTPPort         string
-	SMTPUser         string
-	SMTPPass         string
-	SMTPFrom         string
-	SMTPFromName     string
-	BaseURL          string
-	PasswordReset    string
-	Verification     string
+	Port           string
+	JWTSecret      string
+	DatabaseURL    string
+	DatabaseName   string `mapstructure:"database.name"`
+	DatabaseUser   string `mapstructure:"database.user"`
+	DatabasePassword string `mapstructure:"database.password"`
+	DatabaseHost   string `mapstructure:"database.host"`
+	DatabasePort   string `mapstructure:"database.port"`
+	SMTPHost       string
+	SMTPPort       string
+	SMTPUser       string
+	SMTPPass       string
+	SMTPFrom       string
+	SMTPFromName   string
+	BaseURL        string
+	PasswordReset  string
+	Verification   string
 }
 
 func NewConfig() (*Config, error) {

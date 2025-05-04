@@ -1,6 +1,14 @@
 # Server Configuration
 port: "8080"
 
+# Database Configuration
+database:
+  host: "db.spjqkrsbpwwitwldksvt.supabase.co"
+  port: "5432"
+  name: "postgres"
+  user: "postgres"
+  password: "1234winnie"
+
 # JWT Configuration
 jwt_secret: "your-secret-key-here"
 
