@@ -12,11 +12,11 @@ type Config struct {
 	Port           string
 	JWTSecret      string
 	DatabaseURL    string
-	DatabaseName   string `mapstructure:"database.name"`
-	DatabaseUser   string `mapstructure:"database.user"`
-	DatabasePassword string `mapstructure:"database.password"`
-	DatabaseHost   string `mapstructure:"database.host"`
-	DatabasePort   string `mapstructure:"database.port"`
+	DBName         string `mapstructure:"database.name"`
+	DBUser         string `mapstructure:"database.user"`
+	DBPassword     string `mapstructure:"database.password"`
+	DBHost         string `mapstructure:"database.host"`
+	DBPort         int    `mapstructure:"database.port"`
 	SMTPHost       string
 	SMTPPort       string
 	SMTPUser       string
@@ -27,11 +27,6 @@ type Config struct {
 	PasswordReset  string
 	Verification   string
 	SSLMode        string `mapstructure:"database.sslmode"`
-	DBHost         string `mapstructure:"database.host"`
-	DBPort         int    `mapstructure:"database.port"`
-	DBUser         string `mapstructure:"database.user"`
-	DBPassword     string `mapstructure:"database.password"`
-	DBName         string `mapstructure:"database.name"`
 }
 
 func NewConfig() (*Config, error) {
@@ -64,6 +59,9 @@ func NewConfig() (*Config, error) {
 }
 
 func (c *Config) GetDatabaseURL() string {
+	if c.DatabaseURL != "" {
+		return c.DatabaseURL
+	}
 	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		c.DBHost, c.DBPort, c.DBUser, c.DBPassword, c.DBName, c.SSLMode)
 }
