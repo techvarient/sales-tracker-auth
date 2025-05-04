@@ -1,12 +1,7 @@
 package main
 
 import (
-	"context"
 	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -19,7 +14,6 @@ import (
 	"github.com/sales-tracker/auth-service/internal/usecase"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -42,30 +36,17 @@ func main() {
 		log.Fatal("DatabaseURL configuration missing - check config.yaml")
 	}
 
-	// Configure production-ready logger
-	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
-			SlowThreshold: time.Second,
-			LogLevel: logger.Silent,
-			Colorful: false,
-		},
-	)
-
-	// Initialize database with context timeout
+	// Initialize database
 	dsn := cfg.DatabaseURL
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: newLogger,
-		NowFunc: func() time.Time { return time.Now().UTC() },
-	})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Obtain generic database object sql.DB to use its functions
+	// Get the underlying SQL connection
 	dbSQL, err := db.DB()
 	if err != nil {
-		log.Fatalf("Failed to get generic database object: %v", err)
+		log.Fatalf("Failed to get database connection: %v", err)
 	}
 
 	// Set connection pool settings
@@ -73,10 +54,8 @@ func main() {
 	dbSQL.SetMaxOpenConns(100)
 	dbSQL.SetConnMaxLifetime(time.Hour)
 
-	// Production-grade ping with context timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := dbSQL.PingContext(ctx); err != nil {
+	// Test the connection
+	if err := dbSQL.Ping(); err != nil {
 		log.Fatalf("Database connection failed: %v", err)
 	}
 
@@ -91,54 +70,13 @@ func main() {
 
 	// Register middleware
 	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
 
 	// Register routes
-	api := e.Group("/api")
-	auth := api.Group("/auth")
+	e.POST("/auth/login", authHandler.Login)
+	e.POST("/auth/register", authHandler.Register)
 
-	// Public routes
-	auth.POST("/register", authHandler.Register)
-	auth.POST("/login", authHandler.Login)
-	auth.POST("/forgot-password", authHandler.ForgotPassword)
-	auth.POST("/reset-password", authHandler.ResetPassword)
-
-	// Protected routes
-	protected := api.Group("", middleware.JWTMiddleware(cfg))
-	protected.GET("/health", func(c echo.Context) error {
-		return c.JSON(200, map[string]string{"status": "ok"})
-	})
-
-	// Start server with graceful shutdown
-	server := &http.Server{
-		Addr:    ":" + cfg.Port,
-		Handler: e,
+	// Start server
+	if err := e.Start(":" + cfg.Port); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
 	}
-
-	// Create a context that listens for the interrupt signal from the OS
-	ctx, cancel = context.WithCancel(context.Background())
-	defer cancel()
-
-	// Make the server listen on the specified address
-	go func() {
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("Server shutdown: %v", err)
-		}
-	}()
-
-	// Wait for interrupt signal to gracefully shutdown the server
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-
-	// Shutdown with a timeout
-	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
-	}
-
-	log.Println("Server exiting")
 }
