@@ -26,6 +26,12 @@ type Config struct {
 	BaseURL        string
 	PasswordReset  string
 	Verification   string
+	SSLMode        string `mapstructure:"database.sslmode"`
+	DBHost         string `mapstructure:"database.host"`
+	DBPort         int    `mapstructure:"database.port"`
+	DBUser         string `mapstructure:"database.user"`
+	DBPassword     string `mapstructure:"database.password"`
+	DBName         string `mapstructure:"database.name"`
 }
 
 func NewConfig() (*Config, error) {
@@ -54,9 +60,10 @@ func NewConfig() (*Config, error) {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
-	// Build DatabaseURL
-	cfg.DatabaseURL = "postgresql://" + cfg.DatabaseUser + ":" + cfg.DatabasePassword +
-		"@" + cfg.DatabaseHost + ":" + cfg.DatabasePort + "/" + cfg.DatabaseName
-
 	return cfg, nil
+}
+
+func (c *Config) GetDatabaseURL() string {
+	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		c.DBHost, c.DBPort, c.DBUser, c.DBPassword, c.DBName, c.SSLMode)
 }

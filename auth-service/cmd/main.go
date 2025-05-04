@@ -19,6 +19,7 @@ import (
 	"github.com/sales-tracker/auth-service/internal/usecase"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -36,8 +37,27 @@ func main() {
 	// Initialize Echo
 	e := echo.New()
 
-	// Initialize database connection
-	db, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
+	// Validate database configuration
+	if cfg.DatabaseURL == "" {
+		log.Fatal("DatabaseURL configuration missing - check config.yaml")
+	}
+
+	// Configure production-ready logger
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel: logger.Silent,
+			Colorful: false,
+		},
+	)
+
+	// Initialize database with context timeout
+	dsn := cfg.DatabaseURL
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: newLogger,
+		NowFunc: func() time.Time { return time.Now().UTC() },
+	})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
@@ -53,9 +73,11 @@ func main() {
 	dbSQL.SetMaxOpenConns(100)
 	dbSQL.SetConnMaxLifetime(time.Hour)
 
-	// Ping database to ensure connection is alive
-	if err := dbSQL.Ping(); err != nil {
-		log.Fatalf("Failed to ping database: %v", err)
+	// Production-grade ping with context timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := dbSQL.PingContext(ctx); err != nil {
+		log.Fatalf("Database connection failed: %v", err)
 	}
 
 	// Initialize repositories
@@ -95,7 +117,7 @@ func main() {
 	}
 
 	// Create a context that listens for the interrupt signal from the OS
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel = context.WithCancel(context.Background())
 	defer cancel()
 
 	// Make the server listen on the specified address
