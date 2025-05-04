@@ -37,7 +37,7 @@ func NewConfig() (*Config, error) {
 	// Initialize Viper
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./../") // Look two levels up from the current directory
+	viper.AddConfigPath("internal/config") // Look two levels up from the current directory
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
