@@ -52,11 +52,7 @@ func main() {
 	}
 
 	// Initialize repositories
-	dbSQL, err := db.DB()
-	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
-	}
-	userRepository := repository.NewPostgresUserRepository(dbSQL)
+	userRepository := repository.NewPostgresUserRepository(dbDB)
 
 	// Initialize usecase
 	userUsecase := usecase.NewUserUsecase(userRepository)
