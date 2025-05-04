@@ -42,17 +42,24 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Ping database to ensure connection
-	dbDB, err := db.DB()
+	// Obtain generic database object sql.DB to use its functions
+	dbSQL, err := db.DB()
 	if err != nil {
-		log.Fatalf("Failed to get database connection: %v", err)
+		log.Fatalf("Failed to get generic database object: %v", err)
 	}
-	if err := dbDB.Ping(); err != nil {
+
+	// Set connection pool settings
+	dbSQL.SetMaxIdleConns(10)
+	dbSQL.SetMaxOpenConns(100)
+	dbSQL.SetConnMaxLifetime(time.Hour)
+
+	// Ping database to ensure connection is alive
+	if err := dbSQL.Ping(); err != nil {
 		log.Fatalf("Failed to ping database: %v", err)
 	}
 
 	// Initialize repositories
-	userRepository := repository.NewPostgresUserRepository(dbDB)
+	userRepository := repository.NewPostgresUserRepository(dbSQL)
 
 	// Initialize usecase
 	userUsecase := usecase.NewUserUsecase(userRepository)
