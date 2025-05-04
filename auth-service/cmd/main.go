@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -18,6 +17,8 @@ import (
 	"github.com/sales-tracker/auth-service/internal/middleware"
 	"github.com/sales-tracker/auth-service/internal/repository"
 	"github.com/sales-tracker/auth-service/internal/usecase"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -36,14 +37,26 @@ func main() {
 	e := echo.New()
 
 	// Initialize database connection
-	db, err := sql.Open("postgres", cfg.DatabaseURL)
+	db, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+
+	// Ping database to ensure connection
+	dbDB, err := db.DB()
+	if err != nil {
+		log.Fatalf("Failed to get database connection: %v", err)
+	}
+	if err := dbDB.Ping(); err != nil {
+		log.Fatalf("Failed to ping database: %v", err)
+	}
 
 	// Initialize repositories
-	userRepository := repository.NewPostgresUserRepository(db)
+	dbSQL, err := db.DB()
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	userRepository := repository.NewPostgresUserRepository(dbSQL)
 
 	// Initialize usecase
 	userUsecase := usecase.NewUserUsecase(userRepository)
