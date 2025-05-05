@@ -38,17 +38,39 @@ func NewConfig() (*Config, error) {
 	// Initialize Viper
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("internal/config") // Look two levels up from the current directory
+	viper.AddConfigPath(".") // Look in the current directory
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
+
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
-	// Generate PostgresDSN if not provided
+	// Generate PostgresDSN
+	if config.DBHost == "" {
+		config.DBHost = "localhost"
+	}
+	if config.DBPort == 0 {
+		config.DBPort = 5432
+	}
+	if config.DBUser == "" {
+		config.DBUser = "postgres"
+	}
+	if config.DBName == "" {
+		config.DBName = "auth_db"
+	}
+
+	config.DatabaseURL = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		config.DBHost,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBName,
+		config.SSLMode,
+	)
 	if config.DatabaseURL == "" {
 		config.DatabaseURL = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 			config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName)
