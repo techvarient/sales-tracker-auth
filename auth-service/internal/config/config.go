@@ -27,14 +27,14 @@ type SMTPConfig struct {
 }
 
 type Config struct {
-	Port           string       `mapstructure:"port"`
-	Database       DatabaseConfig `mapstructure:"database"`
-	JWTSecret      string       `mapstructure:"jwt_secret"`
-	SMTP           SMTPConfig   `mapstructure:"smtp"`
-	BaseURL        string       `mapstructure:"base_url"`
-	PasswordReset  string       `mapstructure:"password_reset_path"`
-	Verification   string       `mapstructure:"verification_path"`
-	DatabaseURL    string       // This will be constructed
+	Port          string         `mapstructure:"port"`
+	Database      DatabaseConfig `mapstructure:"database"`
+	JWTSecret     string         `mapstructure:"jwt_secret"`
+	SMTP          SMTPConfig     `mapstructure:"smtp"`
+	BaseURL       string         `mapstructure:"base_url"`
+	PasswordReset string         `mapstructure:"password_reset_path"`
+	Verification  string         `mapstructure:"verification_path"`
+	DatabaseURL   string         // This will be constructed
 }
 
 func NewConfig() (*Config, error) {
@@ -59,7 +59,7 @@ func NewConfig() (*Config, error) {
 
 	// Construct database URL from configuration
 	if config.Database.Host != "" && config.Database.User != "" && config.Database.Name != "" {
-		config.DatabaseURL = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
+		config.DatabaseURL = fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
 			config.Database.User,
 			config.Database.Password,
 			config.Database.Host,
