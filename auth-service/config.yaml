@@ -3,15 +3,15 @@ port: "8080"
 
 # Database Configuration
 database:
-  host: db
+  host: db.spjqkrsbpwwitwldksvt.supabase.co
   port: 5432
   user: postgres
-  password: postgres
-  name: auth_db
+  password: 1234winnie
+  name: postgres
   sslmode: disable
 
 # JWT Configuration
-jwt_secret: "your-secret-key-here"
+jwt_secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
 # SMTP Configuration
 smtp:
