@@ -32,12 +32,12 @@ func main() {
 	e := echo.New()
 
 	// Validate database configuration
-	if cfg.GetDatabaseURL() == "" {
+	if cfg.DatabaseURL == "" {
 		log.Fatal("DatabaseURL configuration missing - check config.yaml")
 	}
 
 	// Initialize database
-	dsn := cfg.GetDatabaseURL()
+	dsn := cfg.DatabaseURL
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)

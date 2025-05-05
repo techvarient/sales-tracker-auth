@@ -9,24 +9,24 @@ import (
 )
 
 type Config struct {
-	Port           string
-	JWTSecret      string
-	DatabaseURL    string
-	DBName         string `mapstructure:"database.name"`
-	DBUser         string `mapstructure:"database.user"`
-	DBPassword     string `mapstructure:"database.password"`
-	DBHost         string `mapstructure:"database.host"`
-	DBPort         int    `mapstructure:"database.port"`
-	SMTPHost       string
-	SMTPPort       string
-	SMTPUser       string
-	SMTPPass       string
-	SMTPFrom       string
-	SMTPFromName   string
-	BaseURL        string
-	PasswordReset  string
-	Verification   string
-	SSLMode        string `mapstructure:"database.sslmode"`
+	Port          string
+	JWTSecret     string
+	DatabaseURL   string
+	DBName        string `mapstructure:"database.name"`
+	DBUser        string `mapstructure:"database.user"`
+	DBPassword    string `mapstructure:"database.password"`
+	DBHost        string `mapstructure:"database.host"`
+	DBPort        int    `mapstructure:"database.port"`
+	SMTPHost      string
+	SMTPPort      string
+	SMTPUser      string
+	SMTPPass      string
+	SMTPFrom      string
+	SMTPFromName  string
+	BaseURL       string
+	PasswordReset string
+	Verification  string
+	SSLMode       string `mapstructure:"database.sslmode"`
 }
 
 func NewConfig() (*Config, error) {
@@ -43,25 +43,16 @@ func NewConfig() (*Config, error) {
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
-
-	// Initialize config struct
-	cfg := &Config{}
-
-	// Override with environment variables
-	viper.AutomaticEnv()
-	viper.SetEnvPrefix("AUTH")
-
-	if err := viper.Unmarshal(cfg); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
+	var config Config
+	if err := viper.Unmarshal(&config); err != nil {
+		return nil, err
 	}
 
-	return cfg, nil
-}
-
-func (c *Config) GetDatabaseURL() string {
-	if c.DatabaseURL != "" {
-		return c.DatabaseURL
+	// Generate PostgresDSN if not provided
+	if config.DatabaseURL == "" {
+		config.DatabaseURL = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+			config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName)
 	}
-	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		c.DBHost, c.DBPort, c.DBUser, c.DBPassword, c.DBName, c.SSLMode)
+
+	return &config, nil
 }
