@@ -8,25 +8,33 @@ import (
 	"github.com/spf13/viper"
 )
 
+type DatabaseConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	User     string `mapstructure:"user"`
+	Password string `mapstructure:"password"`
+	Name     string `mapstructure:"name"`
+	SSLMode  string `mapstructure:"sslmode"`
+}
+
+type SMTPConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     string `mapstructure:"port"`
+	User     string `mapstructure:"user"`
+	Pass     string `mapstructure:"pass"`
+	From     string `mapstructure:"from"`
+	FromName string `mapstructure:"from_name"`
+}
+
 type Config struct {
-	Port          string
-	JWTSecret     string
-	DatabaseURL   string
-	DBName        string `mapstructure:"database.name"`
-	DBUser        string `mapstructure:"database.user"`
-	DBPassword    string `mapstructure:"database.password"`
-	DBHost        string `mapstructure:"database.host"`
-	DBPort        int    `mapstructure:"database.port"`
-	SMTPHost      string
-	SMTPPort      string
-	SMTPUser      string
-	SMTPPass      string
-	SMTPFrom      string
-	SMTPFromName  string
-	BaseURL       string
-	PasswordReset string
-	Verification  string
-	SSLMode       string `mapstructure:"database.sslmode"`
+	Port           string       `mapstructure:"port"`
+	Database       DatabaseConfig `mapstructure:"database"`
+	JWTSecret      string       `mapstructure:"jwt_secret"`
+	SMTP           SMTPConfig   `mapstructure:"smtp"`
+	BaseURL        string       `mapstructure:"base_url"`
+	PasswordReset  string       `mapstructure:"password_reset_path"`
+	Verification   string       `mapstructure:"verification_path"`
+	DatabaseURL    string       // This will be constructed
 }
 
 func NewConfig() (*Config, error) {
@@ -49,31 +57,18 @@ func NewConfig() (*Config, error) {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
-	// Generate PostgresDSN
-	if config.DBHost == "" {
-		config.DBHost = "localhost"
-	}
-	if config.DBPort == 0 {
-		config.DBPort = 5432
-	}
-	if config.DBUser == "" {
-		config.DBUser = "postgres"
-	}
-	if config.DBName == "" {
-		config.DBName = "auth_db"
-	}
-
-	config.DatabaseURL = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		config.DBHost,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBName,
-		config.SSLMode,
-	)
-	if config.DatabaseURL == "" {
-		config.DatabaseURL = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-			config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName)
+	// Construct database URL from configuration
+	if config.Database.Host != "" && config.Database.User != "" && config.Database.Name != "" {
+		config.DatabaseURL = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
+			config.Database.User,
+			config.Database.Password,
+			config.Database.Host,
+			config.Database.Port,
+			config.Database.Name,
+			config.Database.SSLMode,
+		)
+	} else if config.DatabaseURL == "" {
+		return nil, fmt.Errorf("database configuration is incomplete - check config.yaml")
 	}
 
 	return &config, nil

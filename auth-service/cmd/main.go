@@ -35,6 +35,7 @@ func main() {
 	if cfg.DatabaseURL == "" {
 		log.Fatal("DatabaseURL configuration missing - check config.yaml")
 	}
+	println(cfg.DatabaseURL)
 
 	// Initialize database
 	dsn := cfg.DatabaseURL

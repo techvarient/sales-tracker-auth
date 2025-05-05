@@ -21,8 +21,8 @@ func NewSMTPService(config *config.Config) *SMTPService {
 }
 
 func (s *SMTPService) SendVerificationEmail(to string, verificationURL string) error {
-	from := s.config.SMTPFrom
-	fromName := s.config.SMTPFromName
+	from := s.config.SMTP.From
+	fromName := s.config.SMTP.FromName
 	subject := "Verify Your Email Address"
 	body := fmt.Sprintf(`
 Dear user,
@@ -46,13 +46,13 @@ The Sales Tracker Team
 
 	auth := smtp.PlainAuth(
 			"",
-			s.config.SMTPUser,
-			s.config.SMTPPass,
-			s.config.SMTPHost,
+			s.config.SMTP.User,
+			s.config.SMTP.Pass,
+			s.config.SMTP.Host,
 		)
 
 	err := smtp.SendMail(
-			fmt.Sprintf("%s:%s", s.config.SMTPHost, s.config.SMTPPort),
+			fmt.Sprintf("%s:%s", s.config.SMTP.Host, s.config.SMTP.Port),
 			auth,
 			from,
 			[]string{to},
