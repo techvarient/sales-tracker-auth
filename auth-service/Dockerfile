@@ -15,7 +15,7 @@ WORKDIR /app
 
 COPY --from=builder /app/auth-service .
 COPY --from=builder /app/migrations ./migrations
-COPY --from=builder /app/config.yaml ./internal/config/
+COPY --from=builder /app/config.yaml .
 
 EXPOSE 8080
 
