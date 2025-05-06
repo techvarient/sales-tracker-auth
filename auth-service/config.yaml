@@ -2,19 +2,24 @@
 port: "8080"
 
 # Database Configuration
-database:
-  host: db.spjqkrsbpwwitwldksvt.supabase.co
-  port: 5432
-  user: postgres
-  password: 1234winnie
-  name: postgres
-  sslmode: require
+# database:
+#   host: db.spjqkrsbpwwitwldksvt.supabase.co
+#   port: 5432
+#   user: postgres
+#   password: 1234winnie
+#   name: postgres
+#   sslmode: require
   # Additional connection parameters
-  connect_timeout: 10
-  prefer_simple_protocol: true
-  # Timeout settings
-  statement_timeout: 30000
-  idle_in_transaction_session_timeout: 30000
+
+database:
+  host: dpg-d0d31i24d50c73edea90-a.singapore-postgres.render.com
+  port: 5432
+  database: authdb_bvei
+  user: authdb_bvei_user
+  password: qAJD0Jb3V78PkpdwWgVjPLu82qvsbLxK
+  name: authdb_bvei
+  sslmode: require
+
 
 # JWT Configuration
 jwt_secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
