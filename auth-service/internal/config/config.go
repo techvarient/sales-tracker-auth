@@ -59,7 +59,8 @@ func NewConfig() (*Config, error) {
 
 	// Construct database URL from configuration
 	if config.Database.Host != "" && config.Database.User != "" && config.Database.Name != "" {
-		config.DatabaseURL = fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
+		// Force IPv4 and add connection parameters
+		config.DatabaseURL = fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s&connect_timeout=10&sslmode=require&target_session_attrs=read-write",
 			config.Database.User,
 			config.Database.Password,
 			config.Database.Host,

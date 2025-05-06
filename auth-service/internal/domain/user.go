@@ -17,11 +17,12 @@ type User struct {
 	Password            string    `json:"-"`
 	Role                string    `json:"role"`
 	IsVerified          bool      `json:"is_verified"`
-	Name               string    `json:"name"`
-	ResetToken         string    `json:"-"`
+	Name                string    `json:"name"`
+	VerificationToken   string    `json:"-"`
+	ResetToken          string    `json:"-"`
 	ResetTokenExpiresAt time.Time `json:"-"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	CreatedAt           time.Time `json:"created_at"`
+	UpdatedAt           time.Time `json:"updated_at"`
 }
 
 type UserRegistration struct {

@@ -8,7 +8,7 @@ database:
   user: postgres
   password: 1234winnie
   name: postgres
-  sslmode: disable
+  sslmode: require
 
 # JWT Configuration
 jwt_secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
@@ -18,11 +18,11 @@ smtp:
   host: "smtp.gmail.com"
   port: "587"
   user: "abhishekbrichhaliya@gmail.com"
-  pass: "your-app-specific-password"
+  pass: "dbzg lsna gzdm qxyy"
   from: "noreply@sales-tracker.com"
   from_name: "Sales Tracker Team"
 
 # Application URLs
-base_url: "http://localhost:3000"
-password_reset_path: "/reset-password"
-verification_path: "/verify"
+base_url: "http://localhost:8080"
+password_reset_path: "/auth/reset-password.html"
+verification_path: "/auth/verify"
