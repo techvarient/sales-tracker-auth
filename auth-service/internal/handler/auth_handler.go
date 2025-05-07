@@ -96,16 +96,16 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid credentials")
 	}
 
-	h.logger.Infof("User found - ID: %d, Email: %s, Verified: %v", 
+	h.logger.Infof("User found - ID: %d, Email: %s, Verified: %v",
 		user.ID, user.Email, user.IsVerified)
 
 	// Log the first few characters of the stored hash for debugging
-	h.logger.Debugf("Stored password hash: %s... (length: %d)", 
-		user.PasswordHash[:min(10, len(user.PasswordHash))], 
+	h.logger.Debugf("Stored password hash: %s... (length: %d)",
+		user.PasswordHash[:min(10, len(user.PasswordHash))],
 		len(user.PasswordHash))
 
-	h.logger.Debugf("Comparing with password: %s (length: %d)", 
-		strings.Repeat("*", len(req.Password)), 
+	h.logger.Debugf("Comparing with password: %s (length: %d)",
+		strings.Repeat("*", len(req.Password)),
 		len(req.Password))
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password))
@@ -160,7 +160,8 @@ func (h *AuthHandler) ForgotPassword(c echo.Context) error {
 	}
 
 	// Use the frontend URL for the reset link
-	frontendURL := "http://localhost:3000" // Using port 3000 for the frontend
+	//frontendURL := "http://localhost:3000" // Using port 3000 for the frontend
+	frontendURL := "https://sales-tracker-reset-password.onrender.com"
 	resetURL := fmt.Sprintf("%s/reset-password.html?token=%s", frontendURL, resetToken)
 
 	if err := h.emailService.SendPasswordResetEmail(req.Email, resetURL); err != nil {
@@ -196,7 +197,7 @@ func (h *AuthHandler) ResetPassword(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid or expired reset token")
 	}
 
-	h.logger.Infof("Resetting password for user: %s (ID: %d, Verified: %v)", 
+	h.logger.Infof("Resetting password for user: %s (ID: %d, Verified: %v)",
 		user.Email, user.ID, user.IsVerified)
 
 	if len(req.Password) < 8 {

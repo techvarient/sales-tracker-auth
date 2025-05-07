@@ -34,6 +34,7 @@ smtp:
   from_name: "Sales Tracker Team"
 
 # Application URLs
-base_url: "http://localhost:8080"
+# base_url: "http://localhost:8080"
+base_url: "https://sales-tracker-auth.onrender.com"
 password_reset_path: "/auth/reset-password.html"
 verification_path: "/auth/verify"
